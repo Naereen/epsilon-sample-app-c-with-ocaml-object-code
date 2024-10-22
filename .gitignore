@@ -1,1 +1,9 @@
 /output/
+.vscode/
+*~
+*.o
+*.cmx
+*.cmo
+*.cmi
+*.mli
+src/fact.*
