@@ -76,11 +76,9 @@ CFLAGS += -fvisibility=internal
 LDFLAGS += -flinker-output=nolto-rel
 endif
 
-.PHONY: ocaml-c-native-app
-ocaml-c-native-app: ocaml-standalone-object $(BUILD_DIR)/ocaml-c-native-app.nwa
-
 .PHONY: build
 build: $(BUILD_DIR)/app.nwa
+# build: ocaml-standalone-object $(BUILD_DIR)/app.nwa
 
 .PHONY: ocaml-standalone-object
 ocaml-standalone-object:
@@ -117,20 +115,13 @@ $(BUILD_DIR)/%.elf: $(BUILD_DIR)/%.nwa src/input.txt
 $(BUILD_DIR)/app.nwa: $(call object_for,$(src)) $(BUILD_DIR)/icon.o
 	@echo "LD      $@"
 	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(POSTCAMLFLAGS)
-# $(Q) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ src/fact.arm_o $(POSTCAMLFLAGS)
+	readelf -h $@
+	file $@
+	ls -larth $@
 
 $(addprefix $(BUILD_DIR)/,%.o): %.c | $(BUILD_DIR)
 	@echo "CC      $^"
 	$(Q) $(CC) $(CFLAGS) -c $^ -o $@ $(POSTCAMLFLAGS)
-
-# FIXME: experimental: add only ONE rule to compile directly
-$(BUILD_DIR)/ocaml-c-native-app.nwa: $(BUILD_DIR)/icon.o src/main.c
-	@echo "CC+LD   $@"
-	$(Q) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(POSTCAMLFLAGS)
-# $(Q) $(CC) $(CFLAGS) $(LDFLAGS) -o $@ src/fact.arm_o $^ $(POSTCAMLFLAGS)
-	readelf -h $@
-	file $@
-	ls -larth $@
 
 $(BUILD_DIR)/icon.o: src/icon.png
 	@echo "ICON    $<"
